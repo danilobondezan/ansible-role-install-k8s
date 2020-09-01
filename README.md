@@ -6,8 +6,7 @@ Ansible Role for install K8s (one master and two workers)
 
 pip install -r requirements.txt
 
-```ansible-playbook k8s.yml
-```
+```ansible-playbook k8s.yml```
 
 adjust the hosts file as you need with the IPs of the nodes or your dynamic inventory from AWS for example (tag_k8s_master or tag_k8s_worker)
 
