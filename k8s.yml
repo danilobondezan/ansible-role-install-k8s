@@ -16,5 +16,4 @@
   hosts: k8s-workers
   become: yes
   roles:
-    - docker
     - k8s-workers
