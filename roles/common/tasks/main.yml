@@ -1,0 +1,31 @@
+---
+- name: Installing default packages
+  apt: name={{ item }} update_cache=yes state=present
+  with_items: "{{ default_packages }}"
+  tags:
+    - common
+
+- name: Installing sysstat
+  apt: name=sysstat state=present
+  tags:
+    - common
+
+- name: Configuring sysstat
+  replace: dest=/etc/default/sysstat regexp=ENABLED\=\"false\"  replace=ENABLED\=\"true\"
+  tags:
+    - common
+
+- name: Activating sysstat service
+  service: name=sysstat state=started enabled=yes
+  tags:
+    - common
+
+- name: Setting timezone
+  command: timedatectl set-timezone UTC
+  tags:
+    - common
+
+- include: locale.yml
+- include: ntpdate.yml
+- include: mkswap.yml
+  when: mkswap_enable == 'true'

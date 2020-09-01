@@ -1,0 +1,16 @@
+---
+- name: Defining LC_ALL
+  lineinfile:
+    dest=/etc/environment state=present
+    line='LC_ALL="en_US.UTF-8"'
+  tags:
+    - common
+    - locale
+
+- name: Defining locale
+  copy:
+    src=etc/default/locale
+    dest=/etc/default/locale owner=root group=root
+  tags:
+    - common
+    - locale

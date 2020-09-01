@@ -1,0 +1,15 @@
+---
+- name: k8s
+  hosts: k8s
+  gather_facts: yes
+  become: yes
+
+  vars:
+    users:
+      - danilo
+    sudo_users:
+      - danilo
+    users_deleted: []
+
+  roles:
+    - users
