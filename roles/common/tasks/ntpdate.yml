@@ -1,9 +1,0 @@
----
-- name: "Common: copying ntpdate script file"
-  template:
-    src=etc/cron.hourly/ntpdate.j2
-    dest=/etc/cron.hourly/ntpdate
-    owner=root group=root mode=0755
-  tags:
-    - common
-    - ntpdate
