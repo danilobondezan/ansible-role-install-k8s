@@ -1,0 +1,11 @@
+---
+
+- name: Copy script to join worker nodes
+  copy:
+    dest: /opt/kubejoin.sh
+    src: ./join/kubejoin.sh
+    mode: '0700'
+    force: yes
+
+- name: Run command on remote worker nodes
+  shell: /opt/kubejoin.sh

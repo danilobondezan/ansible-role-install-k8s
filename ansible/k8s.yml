@@ -1,0 +1,19 @@
+---
+- name: Install Docker and K8s
+  hosts: k8s-all
+  become: yes
+  roles:
+    - docker
+    - k8s-all
+
+- name: Setup Master Node
+  hosts: k8s-master
+  become: yes
+  roles:
+    - k8s-master
+
+- name: Setup Worker Nodes
+  hosts: k8s-workers
+  become: yes
+  roles:
+    - k8s-workers

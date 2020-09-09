@@ -1,0 +1,56 @@
+---
+
+- name: Destroy Cluster Before Starting Again
+  command: kubeadm reset -f
+
+- name: Clean-up old config
+  shell: |
+        rm -rf $HOME/.kube
+
+- name: Initialize K8s Cluster
+  command: kubeadm init
+  register: kubeadm_init_output
+
+- name: Config to use K8s
+  shell: |
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# - name: Setup kubeconfig for vagrant user
+#   command: "{{ item }}"
+#   with_items:
+#    - mkdir -p /home/vagrant/.kube
+#    - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+#    - chown vagrant:vagrant /home/vagrant/.kube/config
+
+# - debug:
+#     msg: "{{ kubeadm_init_output.stdout_lines }}"
+#     verbosity: 0
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Create File with output
+  copy:
+    content: "{{ join_command.stdout_lines[0] }}"
+    dest: /root/kubejoin.sh
+    force: yes
+
+- name: Get kubejoin
+  fetch:
+    dest: ./join
+    src: /root/kubejoin.sh
+
+- name: Organize Files
+  shell: |
+        cp join/{{ inventory_hostname }}/root/kubejoin.sh join/
+        rm -rf join/{{ inventory_hostname }}
+  delegate_to: localhost
+  become: no
+
+- name: Install pod network
+  command: kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

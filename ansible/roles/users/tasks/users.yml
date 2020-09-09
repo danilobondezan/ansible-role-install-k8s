@@ -1,0 +1,26 @@
+---
+- name: Create users
+  user: name={{ item }} shell=/bin/bash
+  with_items: "{{ users }}"
+
+- name: Generate sudoers temp file
+  command: cp -f /etc/sudoers /etc/sudoers.tmp
+
+- name: Generate sudoers backup file
+  command: cp -f /etc/sudoers /etc/sudoers.bak
+
+- name:  Add users to sudoers temp file
+  lineinfile: dest=/etc/sudoers.tmp state=present regexp="^{{ item }} ALL\=\(ALL\) NOPASSWD:ALL" line="{{ item }} ALL=(ALL) NOPASSWD:ALL"
+  with_items: "{{ sudo_users }}"
+
+- name: Replace sudoers by its temp file
+  shell: "visudo -q -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers"
+
+- name: Add authorized keys
+  authorized_key: user={{ item }} key="{{ lookup('file', item + '.pub') }}"
+  with_items: "{{ users }}"
+
+#####
+#Only used when ansible user is created by userdata on AWS
+- name: Remove authorized keys from ansible user
+  file: name=/home/ansible/.ssh/authorized_keys state=absent

@@ -1,0 +1,26 @@
+---
+- name: Creating swap space
+  command: "fallocate -l {{ansible_memtotal_mb // 2 * 1024 * 1024 }} /var/swap_file"
+  when: ansible_swaptotal_mb < 1
+  tags:
+    - common
+    - mkswap
+
+- name: Making swap
+  command: mkswap /var/swap_file
+  when: ansible_swaptotal_mb < 1
+  tags:
+    - common
+    - mkswap
+
+- name: Adding to fstab
+  action: lineinfile dest=/etc/fstab regexp="swap_file" line="/var/swap_file none swap sw 0 0" state=present
+  tags:
+    - common
+    - mkswap
+
+- name: Enabling swap
+  command: swapon -a
+  tags:
+    - common
+    - mkswap

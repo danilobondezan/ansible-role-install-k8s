@@ -1,0 +1,5 @@
+---
+- name: Restarting rsyslog
+  service: name=rsyslog state=restarted
+  tags:
+    - common
